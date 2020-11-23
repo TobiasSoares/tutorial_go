@@ -1,5 +1,6 @@
 package main
 
+// Adicionado o import do rsc.io/quote
 import (
 	"fmt"
 
