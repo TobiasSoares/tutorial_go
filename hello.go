@@ -19,8 +19,9 @@ func split(sum int) (x, y int) {
 }
 
 var c, python, java bool
+var i, j int = 1, 2
 
 func main() {
-	var i int
-	fmt.Println(c, python, java, i)
+	var c, python, java = true, false, "no!"
+	fmt.Println(c, python, java, i, j)
 }
