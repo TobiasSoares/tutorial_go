@@ -1,2 +1,2 @@
 # tutorial_go
-Tutorial de Go para aprender git.
+Estou realizando o tour da linguagem Go para praticar o uso do git.
