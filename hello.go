@@ -1,12 +1,10 @@
 package main
 
-// Adicionado o import do rsc.io/quote
 import (
 	"fmt"
-
-	"rsc.io/quote"
+	"math/rand"
 )
 
 func main() {
-	fmt.Println(quote.Go())
+	fmt.Println("My favorite number is", rand.Intn(10))
 }
