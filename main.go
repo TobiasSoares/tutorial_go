@@ -82,10 +82,25 @@ func fibonacci() func() int {
 	}
 }
 
-// MAIN
+// Exercício 5: Stringers
+//
+// Implementar a função de print do tipo IPAddr
+
+// IPAddr tipo que guarda um endereço de IP
+type IPAddr [4]byte
+
+// TODO: Add a "String() string" method to IPAddr.
+func (ip IPAddr) String() string {
+	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
+}
+
+// Main
 func main() {
-	f := fibonacci()
-	for i := 0; i < 10; i++ {
-		fmt.Println(f())
+	hosts := map[string]IPAddr{
+		"loopback":  {127, 0, 0, 1},
+		"googleDNS": {8, 8, 8, 8},
+	}
+	for name, ip := range hosts {
+		fmt.Printf("%v: %v\n", name, ip)
 	}
 }
