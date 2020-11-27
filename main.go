@@ -12,6 +12,7 @@ import (
 
 // Sqrt calcula a raiz quadrada do número x passado como
 // argumneto
+/*
 func Sqrt(x float64) float64 {
 	z := float64(1)
 	for i := 0; i < 10; i++ {
@@ -20,6 +21,7 @@ func Sqrt(x float64) float64 {
 	}
 	return z
 }
+*/
 
 // Exercício 2: Slices
 //
@@ -89,18 +91,39 @@ func fibonacci() func() int {
 // IPAddr tipo que guarda um endereço de IP
 type IPAddr [4]byte
 
-// TODO: Add a "String() string" method to IPAddr.
+// String é a função para correta impressão do valor de IPAddr
 func (ip IPAddr) String() string {
 	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
 }
 
+// Exercício 6: Errors
+//
+// Modificar a função Sqrt() anterior para retornar um erro
+
+// Sqrt calcula a raiz quadrada de x se ele for postivo e
+// retorna um erro se ele for negativo
+func Sqrt(x float64) (float64, error) {
+	if x < 0 {
+		return 0, ErrNegativeSqrt(x)
+	}
+
+	z := float64(1)
+	for i := 0; i < 10; i++ {
+		fmt.Println(z)
+		z -= (z*z - x) / (2 * z)
+	}
+	return z, nil
+}
+
+// ErrNegativeSqrt é o tipo do erro
+type ErrNegativeSqrt float64
+
+func (e ErrNegativeSqrt) Error() string {
+	return fmt.Sprintf("cannot Sqrt negative number: %f", e)
+}
+
 // Main
 func main() {
-	hosts := map[string]IPAddr{
-		"loopback":  {127, 0, 0, 1},
-		"googleDNS": {8, 8, 8, 8},
-	}
-	for name, ip := range hosts {
-		fmt.Printf("%v: %v\n", name, ip)
-	}
+	fmt.Println(Sqrt(2))
+	fmt.Println(Sqrt(-2))
 }
