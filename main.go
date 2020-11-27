@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"strings"
-
-	"golang.org/x/tour/wc"
 )
 
 // Exercício 1: Loops e funções
@@ -56,7 +54,38 @@ func WordCount(s string) map[string]int {
 	return mapa
 }
 
+// Exercício 4: Closures
+//
+// Implementar a função fibonacci
+
+// fibonacci é uma "fuction closure" que calcula números
+// consecutivos da sequencia de fibonacci
+func fibonacci() func() int {
+	var indice, anterior, atual, proximo int
+
+	return func() int {
+		if indice == 0 {
+			indice++
+			return 0
+		}
+		if indice == 1 {
+			indice++
+			atual = 1
+			return 1
+		}
+
+		anterior = atual
+		atual = proximo
+		proximo = anterior + atual
+		indice++
+		return proximo
+	}
+}
+
 // MAIN
 func main() {
-	wc.Test(WordCount)
+	f := fibonacci()
+	for i := 0; i < 10; i++ {
+		fmt.Println(f())
+	}
 }
