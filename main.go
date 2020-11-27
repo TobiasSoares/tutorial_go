@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 
-	"golang.org/x/tour/pic"
+	"strings"
+
+	"golang.org/x/tour/wc"
 )
 
 // Exercício 1: Loops e funções
@@ -38,7 +40,23 @@ func Pic(dx, dy int) [][]uint8 {
 	return saida
 }
 
+// Exercício 3: Maps
+//
+// Implementar a função WordCount
+
+// WordCount conta o número de palavras em uma string s
+// passada como argumneto
+func WordCount(s string) map[string]int {
+	mapa := make(map[string]int)
+	palavras := strings.Fields(s)
+
+	for _, pal := range palavras {
+		mapa[pal]++
+	}
+	return mapa
+}
+
 // MAIN
 func main() {
-	pic.Show(Pic)
+	wc.Test(WordCount)
 }
