@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
+
+	"os"
 
 	"strings"
-
-	"golang.org/x/tour/reader"
 )
 
 // Exercício 1: Loops e funções
@@ -131,7 +132,6 @@ func (e ErrNegativeSqrt) Error() string {
 // MyReader emite uma quantidade infinita de 'A'
 type MyReader struct{}
 
-// TODO: Add a Read([]byte) (int, error) method to MyReader.
 func (mr MyReader) Read(destino []byte) (int, error) {
 	lidos := 0
 	for i := 0; i < len(destino); i++ {
@@ -141,7 +141,47 @@ func (mr MyReader) Read(destino []byte) (int, error) {
 	return lidos, nil
 }
 
+// Exercício 8: rot13Reader
+//
+// Criar um tipo Reader que implemente o rot13
+
+type rot13Reader struct {
+	r io.Reader
+}
+
+func (rot13 rot13Reader) Read(destino []byte) (int, error) {
+	lidos, eof := rot13.r.Read(destino)
+	var novaLetra byte
+
+	for i := 0; i < len(destino); i++ {
+		if destino[i] < 65 || destino[i] > 123 ||
+			destino[i] > 90 && destino[i] < 97 {
+			continue
+		}
+
+		switch {
+		case destino[i] >= 96:
+			novaLetra = destino[i] + 13
+			if novaLetra > 122 {
+				novaLetra = (novaLetra % 122) + 96
+			}
+			destino[i] = novaLetra
+
+		case destino[i] >= 65:
+			novaLetra = destino[i] + 13
+			if novaLetra > 90 {
+				novaLetra = (novaLetra % 90) + 65
+			}
+			destino[i] = novaLetra
+		}
+	}
+
+	return lidos, eof
+}
+
 // Main
 func main() {
-	reader.Validate(MyReader{})
+	s := strings.NewReader("Lbh penpxrq gur pbqr!")
+	r := rot13Reader{s}
+	io.Copy(os.Stdout, &r)
 }
