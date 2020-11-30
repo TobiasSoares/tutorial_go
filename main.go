@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"strings"
+
+	"golang.org/x/tour/reader"
 )
 
 // Exercício 1: Loops e funções
@@ -122,8 +124,24 @@ func (e ErrNegativeSqrt) Error() string {
 	return fmt.Sprintf("cannot Sqrt negative number: %f", e)
 }
 
+// Exercício 7: Readers
+//
+// Criar um tipo Reader que emite uma quantidade infinita de 'A'
+
+// MyReader emite uma quantidade infinita de 'A'
+type MyReader struct{}
+
+// TODO: Add a Read([]byte) (int, error) method to MyReader.
+func (mr MyReader) Read(destino []byte) (int, error) {
+	lidos := 0
+	for i := 0; i < len(destino); i++ {
+		destino[i] = 'A'
+		lidos++
+	}
+	return lidos, nil
+}
+
 // Main
 func main() {
-	fmt.Println(Sqrt(2))
-	fmt.Println(Sqrt(-2))
+	reader.Validate(MyReader{})
 }
