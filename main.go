@@ -2,11 +2,16 @@ package main
 
 import (
 	"fmt"
+
 	"io"
 
-	"os"
-
 	"strings"
+
+	"golang.org/x/tour/pic"
+
+	"image"
+
+	"image/color"
 )
 
 // Exercício 1: Loops e funções
@@ -179,9 +184,31 @@ func (rot13 rot13Reader) Read(destino []byte) (int, error) {
 	return lidos, eof
 }
 
+// Exercício 9: Images
+//
+// Criar o tipo Image para construir uma imagem
+
+// Image é o tipo que definde uma imagem
+type Image struct{}
+
+// ColorModel é a função que devolve o tipo de cor da imagem
+func (i Image) ColorModel() color.Model {
+	return color.RGBAModel
+}
+
+// Bounds retorna o retângulo contendo a imagem
+func (i Image) Bounds() image.Rectangle {
+	return image.Rect(0, 0, 500, 250)
+}
+
+// At retorna a cor na posicao x, y informada
+func (i Image) At(x, y int) color.Color {
+	cor := uint8(x + y/2)
+	return color.RGBA{cor, cor, 255, 255}
+}
+
 // Main
 func main() {
-	s := strings.NewReader("Lbh penpxrq gur pbqr!")
-	r := rot13Reader{s}
-	io.Copy(os.Stdout, &r)
+	m := Image{}
+	pic.ShowImage(m)
 }
