@@ -12,6 +12,8 @@ import (
 	"image"
 
 	"image/color"
+
+	"sync"
 )
 
 // Exercício 1: Loops e funções
@@ -241,10 +243,118 @@ func Same(t1, t2 *tree.Tree) bool {
 	return true
 }
 
+// Exercício 11: Web Crawler
+//
+// Buscar URLs usando paralelismo
+
+// Fetcher returns the body of URL and
+// a slice of URLs found on that page.
+type Fetcher interface {
+	Fetch(url string) (body string, urls []string, err error)
+}
+
+// fakeFetcher is Fetcher that returns canned results.
+type fakeFetcher map[string]*fakeResult
+
+type fakeResult struct {
+	body string
+	urls []string
+}
+
+func (f fakeFetcher) Fetch(url string) (string, []string, error) {
+	if res, ok := f[url]; ok {
+		return res.body, res.urls, nil
+	}
+	return "", nil, fmt.Errorf("not found: %s", url)
+}
+
+// fetcher is a populated fakeFetcher.
+var fetcher = fakeFetcher{
+	"https://golang.org/": &fakeResult{
+		"The Go Programming Language",
+		[]string{
+			"https://golang.org/pkg/",
+			"https://golang.org/cmd/",
+		},
+	},
+	"https://golang.org/pkg/": &fakeResult{
+		"Packages",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/cmd/",
+			"https://golang.org/pkg/fmt/",
+			"https://golang.org/pkg/os/",
+		},
+	},
+	"https://golang.org/pkg/fmt/": &fakeResult{
+		"Package fmt",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/pkg/",
+		},
+	},
+	"https://golang.org/pkg/os/": &fakeResult{
+		"Package os",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/pkg/",
+		},
+	},
+}
+
+// Cache é uma estrutura que guarda a informação
+// de quais URLs foram visitadas. Possui segurança de
+// paralelismo (Mutex)
+type Cache struct {
+	tabela map[string]bool
+	mux    sync.Mutex
+}
+
+// foiVisitado verifica se a URL está presente no
+// cache de URLs visitadas
+func (v *Cache) foiVisitado(url string) bool {
+	v.mux.Lock()
+	defer v.mux.Unlock()
+
+	_, ocupado := v.tabela[url]
+
+	if !ocupado {
+		v.tabela[url] = true
+		return false
+	}
+	return true
+}
+
+// Crawl uses fetcher to recursively crawl
+// pages starting with url, to a maximum of depth.
+func Crawl(url string, depth int, fetcher Fetcher, visitados *Cache, espera *sync.WaitGroup) {
+	defer espera.Done()
+
+	if depth <= 0 || visitados.foiVisitado(url) {
+		return
+	}
+
+	body, urls, err := fetcher.Fetch(url)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("found: %s %q\n", url, body)
+	for _, u := range urls {
+		espera.Add(1)
+		Crawl(u, depth-1, fetcher, visitados, espera)
+	}
+
+	return
+}
+
 // Main
 func main() {
-	arvore := tree.New(5)
+	visitados := Cache{tabela: make(map[string]bool)}
+	var espera sync.WaitGroup
 
-	fmt.Println(Same(arvore, arvore))
-	fmt.Println(Same(arvore, tree.New(1)))
+	espera.Add(1)
+	Crawl("https://golang.org/", 4, fetcher, &visitados, &espera)
+	espera.Wait()
 }
