@@ -7,7 +7,7 @@ import (
 
 	"strings"
 
-	"golang.org/x/tour/pic"
+	"golang.org/x/tour/tree"
 
 	"image"
 
@@ -207,8 +207,44 @@ func (i Image) At(x, y int) color.Color {
 	return color.RGBA{cor, cor, 255, 255}
 }
 
+// Exercício 10: Equivalent Binary Trees
+//
+// Verificar se duas árvores binárias são equivalentes
+
+// Walk caminha pela árvore enviando os valores contidos nos nodos
+// para o canal
+func Walk(t *tree.Tree, ch chan int) {
+	if t == nil {
+		return
+	}
+
+	Walk(t.Left, ch)
+	ch <- t.Value
+	Walk(t.Right, ch)
+}
+
+// Same devolve true se ambas as árvores forem iguais
+func Same(t1, t2 *tree.Tree) bool {
+	canal1 := make(chan int, 10)
+	canal2 := make(chan int, 10)
+
+	go Walk(t1, canal1)
+	go Walk(t2, canal2)
+
+	for i := 0; i < 10; i++ {
+		um, dois := <-canal1, <-canal2
+
+		if um != dois {
+			return false
+		}
+	}
+	return true
+}
+
 // Main
 func main() {
-	m := Image{}
-	pic.ShowImage(m)
+	arvore := tree.New(5)
+
+	fmt.Println(Same(arvore, arvore))
+	fmt.Println(Same(arvore, tree.New(1)))
 }
